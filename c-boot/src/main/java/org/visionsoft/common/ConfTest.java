@@ -9,10 +9,18 @@ import java.util.Set;
 
 public class ConfTest {
 
+    @Bean("customConverter")
+    public Converter myCustomConverter() {
+        return new Converter() {
+            public Object convert(Object o, Class aClass, Object o1) {
+                return null;
+            }
+        };
+    }
+
     @Bean(name="conversionService")
-    public ConversionServiceFactoryBean getConversionService() {
+    public ConversionServiceFactoryBean getConversionService(Set<Converter> converters) {
         ConversionServiceFactoryBean bean = new ConversionServiceFactoryBean();
-        Set<Converter> converters = new HashSet<Converter>();
         bean.setConverters(converters);
         return bean;
     }
