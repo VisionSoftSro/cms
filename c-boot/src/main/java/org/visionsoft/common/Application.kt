@@ -17,7 +17,7 @@ import java.util.HashSet
 
 @SpringBootApplication//(exclude=[DispatcherServletAutoConfiguration::class])
 @EnableAspectJAutoProxy
-@Import(DomainConfig::class, MvcConfig::class, ConfTest::class, TestConf::class)
+@Import(DomainConfig::class, MvcConfig::class)
 class Application: SpringBootServletInitializer() {
     override fun configure(builder: SpringApplicationBuilder) = builder.sources(Application::class.java)!!
 
