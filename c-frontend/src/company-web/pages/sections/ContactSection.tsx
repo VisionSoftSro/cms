@@ -42,7 +42,7 @@ export class ContactSection extends React.Component<SectionComponentProps> {
                     </div>
                 </div>
             </section>
-            <section id="contact-info" className="parallax-section small parallax dark">
+            <section id="contact" className="parallax-section small parallax dark">
                 <div className="container">
                     <div className="row">
                         <div className="col-md-4">
