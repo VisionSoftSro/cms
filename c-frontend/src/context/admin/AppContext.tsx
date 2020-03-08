@@ -23,21 +23,16 @@ export function useAppContext() {
 function UserContext({children, setUser}:React.PropsWithChildren<{setUser:(user:User)=>void}>) {
     const {setLoading} = useLoadingContext();
     const {logout, user} = useAppContext();
-    const [request, response] = useFetch<User>();//{path:`/user`, cachePolicy:CachePolicies.NO_CACHE}
+    const {data, loading, error} = useFetch<User>({path:`/user`, cachePolicy:CachePolicies.NO_CACHE}, []);
     useEffect(() => {
-        const fetchUser = async() => {
-            setLoading(true);
-            const result = await request.get("/user");
-            setLoading(false);
-            if(response.ok) {
-                setUser(result);
-            } else {
-                logout();
-            }
-
-        };
-        invoke(fetchUser);
-    }, []);
+        setLoading(true);
+        if(error) {
+            logout();
+        } else if(data) {
+            setUser(data);
+        }
+        setLoading(false);
+    }, [data, error]);
     return (
         <>
             {
