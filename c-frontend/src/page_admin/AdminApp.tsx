@@ -3,6 +3,7 @@ import {Provider} from "use-http/dist";
 import {useStyles} from "./AdminStyles";
 import {AppBar, Toolbar} from "@material-ui/core";
 import {useRouteMatch} from "react-router";
+import {useAppContext} from "../context/admin/AppContext";
 
 
 function Header() {
@@ -23,11 +24,15 @@ function Header() {
 
 export function AdminApp() {
     const {url} = useRouteMatch();
-    return <div>Admin app
-        {/*<Switch>*/}
-        {/*<Route path={`${url}/r`} component={r}/>*/}
-        {/*<Route path={`${url}/l`} component={l}/>*/}
-        {/*<Route path={`${url}/*`} component={e}/>*/}
-        {/*</Switch>*/}
-    </div>
+    const {user} = useAppContext();
+    return (
+        <>
+            <Header/>
+            {/*<Switch>*/}
+            {/*<Route path={`${url}/r`} component={r}/>*/}
+            {/*<Route path={`${url}/l`} component={l}/>*/}
+            {/*<Route path={`${url}/*`} component={e}/>*/}
+            {/*</Switch>*/}
+        </>
+    );
 }

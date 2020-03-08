@@ -4,6 +4,7 @@ import useFetch, {CachePolicies, Provider} from "use-http/dist";
 import {Token, User} from "../../api/admin/ApiTypes";
 import LoginPage from "../../page_admin/LoginPage";
 import {useLoadingContext} from "../LoadingContext";
+import * as LocaleStorage from "../../util/LocalStorage";
 
 type DataState = {
     user:User
@@ -43,13 +44,15 @@ function UserContext({children, setUser}:React.PropsWithChildren<{setUser:(user:
         </>
     );
 }
-
+const tokenStorageKey = "token";
 export function AppContext({children}:React.PropsWithChildren<{}>) {
-    const [token, setTokenLocally] = useState(null as Token);
+    const [token, setTokenLocally] = useState(()=>LocaleStorage.get<Token>(tokenStorageKey));
     const [user, setUser] = useState(null as User);
     useEffect(()=>{
         if(token === null) {
             setUser(null);
+        } else {
+            LocaleStorage.set(tokenStorageKey, token);
         }
     }, [token]);
 
