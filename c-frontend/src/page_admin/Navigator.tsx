@@ -52,7 +52,7 @@ const styles = (theme: Theme) =>
             color: theme.palette.common.white,
         },
         itemActiveItem: {
-            color: '#4fc3f7',
+            color: theme.palette.primary.light,
         },
         itemPrimary: {
             fontSize: 'inherit',

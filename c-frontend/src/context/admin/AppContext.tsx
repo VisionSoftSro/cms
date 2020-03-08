@@ -1,12 +1,10 @@
 import * as React from "react";
-import {useContext, useEffect, useReducer, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import useFetch, {CachePolicies, Provider} from "use-http/dist";
 import {Token, User} from "../../api/admin/ApiTypes";
 import LoginPage from "../../page_admin/LoginPage";
 import {useLoadingContext} from "../LoadingContext";
 import * as LocaleStorage from "../../util/LocalStorage";
-import {sleep} from "../../util/Sleep";
-import {invoke} from "../../util/Invoke";
 
 type DataState = {
     user:User
@@ -23,7 +21,7 @@ export function useAppContext() {
 function UserContext({children, setUser}:React.PropsWithChildren<{setUser:(user:User)=>void}>) {
     const {setLoading} = useLoadingContext();
     const {logout, user} = useAppContext();
-    const {data, loading, error} = useFetch<User>({path:`/user`, cachePolicy:CachePolicies.NO_CACHE}, []);
+    const {data, loading, error} = useFetch<User>({path:`/user`}, []);
     useEffect(() => {
         setLoading(true);
         if(error) {
@@ -72,6 +70,7 @@ export function AppContext({children}:React.PropsWithChildren<{}>) {
                         Accept: 'application/json',
                         Authorization: `Bearer ${token.access_token}`
                     },
+                    cachePolicy:CachePolicies.NO_CACHE,
                     interceptors: {
                         response:response => {
                             if(response.status === 401) {
