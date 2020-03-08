@@ -15,6 +15,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { createStyles, Theme, withStyles, WithStyles } from '@material-ui/core/styles';
+import {useCurrentRoute} from "./routes";
+import {useTranslation} from "react-i18next";
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -47,7 +49,7 @@ interface HeaderProps extends WithStyles<typeof styles> {
 
 function Header(props: HeaderProps) {
     const { classes, onDrawerToggle } = props;
-
+    const {t} = useTranslation();
     return (
         <React.Fragment>
             <AppBar color="primary" position="sticky" elevation={0}>
@@ -97,7 +99,7 @@ function Header(props: HeaderProps) {
                     <Grid container alignItems="center" spacing={1}>
                         <Grid item xs>
                             <Typography color="inherit" variant="h5" component="h1">
-                                Authentication
+                                {t(useCurrentRoute().id)}
                             </Typography>
                         </Grid>
                         <Grid item>
@@ -114,20 +116,6 @@ function Header(props: HeaderProps) {
                         </Grid>
                     </Grid>
                 </Toolbar>
-            </AppBar>
-            <AppBar
-                component="div"
-                className={classes.secondaryBar}
-                color="primary"
-                position="static"
-                elevation={0}
-            >
-                <Tabs value={0} textColor="inherit">
-                    <Tab textColor="inherit" label="Users" />
-                    <Tab textColor="inherit" label="Sign-in method" />
-                    <Tab textColor="inherit" label="Templates" />
-                    <Tab textColor="inherit" label="Usage" />
-                </Tabs>
             </AppBar>
         </React.Fragment>
     );

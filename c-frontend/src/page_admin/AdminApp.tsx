@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     createMuiTheme,
-    createStyles,
+    createStyles, makeStyles,
     ThemeProvider,
     withStyles,
     WithStyles,
@@ -13,7 +13,7 @@ import Link from '@material-ui/core/Link';
 import Navigator from './Navigator';
 import Content from './Content';
 import Header from './Header';
-import {routes} from "./routes";
+import {routes, useFlatRoutes} from "./routes";
 import {Redirect, Switch, Route} from "react-router-dom";
 import {useRouteMatch} from "react-router";
 
@@ -30,119 +30,10 @@ function Copyright() {
     );
 }
 
-let theme = createMuiTheme({
-    palette: {
-        primary: {
-            light: '#63ccff',
-            main: '#009be5',
-            dark: '#006db3',
-        },
-    },
-    typography: {
-        h5: {
-            fontWeight: 500,
-            fontSize: 26,
-            letterSpacing: 0.5,
-        },
-    },
-    shape: {
-        borderRadius: 8,
-    },
-    props: {
-        MuiTab: {
-            disableRipple: true,
-        },
-    },
-    mixins: {
-        toolbar: {
-            minHeight: 48,
-        },
-    },
-});
-
-theme = {
-    ...theme,
-    overrides: {
-        MuiDrawer: {
-            paper: {
-                backgroundColor: '#18202c',
-            },
-        },
-        MuiButton: {
-            label: {
-                textTransform: 'none',
-            },
-            contained: {
-                boxShadow: 'none',
-                '&:active': {
-                    boxShadow: 'none',
-                },
-            },
-        },
-        MuiTabs: {
-            root: {
-                marginLeft: theme.spacing(1),
-            },
-            indicator: {
-                height: 3,
-                borderTopLeftRadius: 3,
-                borderTopRightRadius: 3,
-                backgroundColor: theme.palette.common.white,
-            },
-        },
-        MuiTab: {
-            root: {
-                textTransform: 'none',
-                margin: '0 16px',
-                minWidth: 0,
-                padding: 0,
-                [theme.breakpoints.up('md')]: {
-                    padding: 0,
-                    minWidth: 0,
-                },
-            },
-        },
-        MuiIconButton: {
-            root: {
-                padding: theme.spacing(1),
-            },
-        },
-        MuiTooltip: {
-            tooltip: {
-                borderRadius: 4,
-            },
-        },
-        MuiDivider: {
-            root: {
-                backgroundColor: '#404854',
-            },
-        },
-        MuiListItemText: {
-            primary: {
-                fontWeight: theme.typography.fontWeightMedium,
-            },
-        },
-        MuiListItemIcon: {
-            root: {
-                color: 'inherit',
-                marginRight: 0,
-                '& svg': {
-                    fontSize: 20,
-                },
-            },
-        },
-        MuiAvatar: {
-            root: {
-                width: 32,
-                height: 32,
-            },
-        },
-    },
-};
 
 const drawerWidth = 256;
 
-const styles = createStyles({
+const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
         minHeight: '100vh',
@@ -167,12 +58,11 @@ const styles = createStyles({
         padding: theme.spacing(2),
         background: '#eaeff1',
     },
-});
+}));
 
-export interface PaperbaseProps extends WithStyles<typeof styles> {}
 
-function Paperbase(props: PaperbaseProps) {
-    const { classes } = props;
+function Paperbase() {
+    const classes = useStyles();
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const {url} = useRouteMatch();
     const handleDrawerToggle = () => {
@@ -180,7 +70,6 @@ function Paperbase(props: PaperbaseProps) {
     };
 
     return (
-        <ThemeProvider theme={theme}>
             <div className={classes.root}>
                 <CssBaseline />
                 <nav className={classes.drawer}>
@@ -200,7 +89,7 @@ function Paperbase(props: PaperbaseProps) {
                     <Header onDrawerToggle={handleDrawerToggle} />
                     <main className={classes.main}>
                         <Switch>
-                            {routes.map(r=>r.children).flat().map(route=>(<Route key={route.href} path={`${url}${route.href}`} component={route.component}/>))}
+                            {useFlatRoutes().map(route=>(<Route key={route.href} path={`${url}${route.href}`} component={route.component}/>))}
                             <Redirect from={`${url}`} to={`${url}/article`} />
                         </Switch>
                     </main>
@@ -209,8 +98,7 @@ function Paperbase(props: PaperbaseProps) {
                     </footer>
                 </div>
             </div>
-        </ThemeProvider>
     );
 }
 
-export default withStyles(styles)(Paperbase);
+export default Paperbase;

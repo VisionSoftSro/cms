@@ -9,6 +9,7 @@ import TimerIcon from "@material-ui/icons/Timer";
 import PhonelinkSetupIcon from "@material-ui/icons/PhonelinkSetup";
 import React from "react";
 import {Articles} from "./page/Articles";
+import {useLocation, useRouteMatch} from "react-router";
 
 export const routes = [
     {
@@ -31,3 +32,16 @@ export const routes = [
         ],
     },
 ];
+
+export const useFlatRoutes = () => {
+    return routes.map(r=>r.children).flat();
+};
+
+export function useCurrentRoute() {
+    const routes = useFlatRoutes();
+    const {pathname} = useLocation();
+    const {url} = useRouteMatch();
+    console.log("useCurrentRoute", pathname);
+    const currentNav = routes.filter(cfg=> `${url}${cfg.href}` === pathname);
+    return currentNav.length === 0 ? routes[0] : currentNav[0];
+}
