@@ -3,9 +3,9 @@ import {createMuiTheme} from "@material-ui/core/styles";
 let theme = createMuiTheme({
     palette: {
         primary: {
-            light: '#63ccff',
-            main: '#009be5',
-            dark: '#006db3',
+            light: '#b29fff',
+            main: '#9442e5',
+            dark: '#5700b3',
         },
     },
     typography: {
@@ -16,7 +16,7 @@ let theme = createMuiTheme({
         },
     },
     shape: {
-        borderRadius: 8,
+        // borderRadius: 8,
     },
     props: {
         MuiTab: {

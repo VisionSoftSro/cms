@@ -10,17 +10,14 @@ import PhonelinkSetupIcon from "@material-ui/icons/PhonelinkSetup";
 import React from "react";
 import {Articles} from "./page/Articles";
 import {useLocation, useRouteMatch} from "react-router";
-
+import CategoryIcon from '@material-ui/icons/Category';
+import DescriptionIcon from '@material-ui/icons/Description';
 export const routes = [
     {
-        id: 'Develop',
+        id: 'Codebook',
         children: [
-            { id: 'Authentication', icon: <PeopleIcon />, href:"/article", component:Articles},
-            { id: 'Database', icon: <DnsRoundedIcon />, href:"/article2", component:Articles},
-            { id: 'Storage', icon: <PermMediaOutlinedIcon />, href:"/article3", component:Articles},
-            { id: 'Hosting', icon: <PublicIcon />, href:"/article4", component:Articles},
-            { id: 'Functions', icon: <SettingsEthernetIcon />, href:"/article5", component:Articles},
-            { id: 'ML Kit', icon: <SettingsInputComponentIcon />, href:"/article6", component:Articles},
+            { id: 'Articles', icon: <DescriptionIcon />, href:"/article", component:Articles},
+            { id: 'Categories', icon: <CategoryIcon />, href:"/category", component:Articles}
         ],
     },
     {
