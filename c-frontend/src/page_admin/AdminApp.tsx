@@ -39,7 +39,7 @@ export function AdminApp() {
             <a href={""} onClick={(e)=>{
                 e.preventDefault();
                 setTest(!test);
-            }}>Klik</a>
+            }}>Klika</a>
             {test&&<SleepTest/>}
             {/*<Switch>*/}
             {/*<Route path={`${url}/r`} component={r}/>*/}
