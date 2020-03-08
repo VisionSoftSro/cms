@@ -6,9 +6,10 @@
       "dom.iterable",
       "esnext"
     ],
-    "typeRoots": ["node_modules/@types"],
-
-    "composite": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "composite": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowJs": true,
@@ -18,20 +19,17 @@
     "strict": true,
     "strictNullChecks": false,
     "forceConsistentCasingInFileNames": true,
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
     "sourceMap": true,
     "importHelpers": true,
     "declaration": false,
-    "removeComments": true,
-    
+    "removeComments": true
   },
-  "files":[
-  ],
   "exclude": [
     "node_modules"
   ],

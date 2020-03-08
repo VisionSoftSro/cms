@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices
 import org.visionsoft.common.IUser
+import org.visionsoft.common.transaction.transaction
 
 
 abstract class OauthSecurityConfiguration<U : IUser> : ResourceServerConfigurerAdapter(), ITokenExtractor<U> {
@@ -71,7 +72,7 @@ interface ITokenExtractor<U:IUser> {
 }
 
 class TokenConverter<U : IUser>(var provider:ITokenExtractor<U>) : DefaultUserAuthenticationConverter() {
-    override fun extractAuthentication(map: MutableMap<String, *>?) = super.extractAuthentication(map).let { OauthAuthentication(provider.extractAuthentication(it), it) }
+    override fun extractAuthentication(map: MutableMap<String, *>?) = transaction {_-> super.extractAuthentication(map).let { OauthAuthentication(provider.extractAuthentication(it), it) } }
 
 }
 

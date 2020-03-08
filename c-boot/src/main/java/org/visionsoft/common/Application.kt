@@ -9,9 +9,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.annotation.Import
 import org.springframework.context.support.ConversionServiceFactoryBean
-import org.visionsoft.cmr.mvc.config.MvcConfig
-import org.visionsoft.cmr.mvc.config.WebSocketClientConfig
-import org.visionsoft.crm.domain.config.DomainConfig
+import org.visionsoft.cms.mvc.config.MvcConfig
+import org.visionsoft.cms.domain.config.DomainConfig
 import java.util.HashSet
 
 
