@@ -1,9 +1,11 @@
 import * as React from "react";
-import {Provider} from "use-http/dist";
+import useFetch, {CachePolicies, Provider} from "use-http/dist";
 import {useStyles} from "./AdminStyles";
-import {AppBar, Toolbar} from "@material-ui/core";
+import {AppBar, Button, Link, Toolbar} from "@material-ui/core";
 import {useRouteMatch} from "react-router";
 import {useAppContext} from "../context/admin/AppContext";
+import {User} from "../api/admin/ApiTypes";
+import {useState} from "react";
 
 
 function Header() {
@@ -21,13 +23,24 @@ function Header() {
     );
 }
 
+export function SleepTest() {
+    const {data} = useFetch({path:"/sleep?ms=5000", cachePolicy:CachePolicies.NO_CACHE});
+    console.log("Sleep", data);
+    return <div>fetching</div>;
+}
 
 export function AdminApp() {
     const {url} = useRouteMatch();
     const {user} = useAppContext();
+    const [test, setTest] = useState(false);
     return (
         <>
             <Header/>
+            <a href={""} onClick={(e)=>{
+                e.preventDefault();
+                setTest(!test);
+            }}>Klik</a>
+            {test&&<SleepTest/>}
             {/*<Switch>*/}
             {/*<Route path={`${url}/r`} component={r}/>*/}
             {/*<Route path={`${url}/l`} component={l}/>*/}

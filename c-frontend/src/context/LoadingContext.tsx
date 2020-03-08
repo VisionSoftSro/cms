@@ -20,7 +20,12 @@ const useStyles = makeStyles(theme => ({
 
 export function LoadingContext({children}:React.PropsWithChildren<{}>) {
     const classes = useStyles();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoadingLocal] = useState(false);
+
+    const setLoading = (value:boolean) => {
+        setLoadingLocal(value || false);
+    };
+
     return (
         <Context.Provider value={{loading, setLoading}}>
             {children}

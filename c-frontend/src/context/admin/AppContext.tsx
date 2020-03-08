@@ -5,39 +5,43 @@ import {Token, User} from "../../api/admin/ApiTypes";
 import LoginPage from "../../page_admin/LoginPage";
 import {useLoadingContext} from "../LoadingContext";
 import * as LocaleStorage from "../../util/LocalStorage";
+import {sleep} from "../../util/Sleep";
+import {invoke} from "../../util/Invoke";
 
 type DataState = {
     user:User
 }
 type AppState = {
     logout:VoidFunction
-}&DataState
+} & DataState
 const Context = React.createContext({} as AppState);
 
 export function useAppContext() {
     return useContext(Context);
 }
 
-
 function UserContext({children, setUser}:React.PropsWithChildren<{setUser:(user:User)=>void}>) {
-    const {loading, setLoading} = useLoadingContext();
-    const {logout} = useAppContext();
-    const result = useFetch<User>({path:`/user`, cachePolicy:CachePolicies.NO_CACHE}, []);
+    const {setLoading} = useLoadingContext();
+    const {logout, user} = useAppContext();
+    const [request, response] = useFetch<User>();//{path:`/user`, cachePolicy:CachePolicies.NO_CACHE}
+    useEffect(() => {
+        const fetchUser = async() => {
+            setLoading(true);
+            const result = await request.get("/user");
+            setLoading(false);
+            if(response.ok) {
+                setUser(result);
+            } else {
+                logout();
+            }
 
-    useEffect(()=>{
-        const {error, loading:fetchLoading, data} = result;
-        setLoading(fetchLoading);
-        if(error) {
-            logout();
-        } else if(data) {
-            setUser(data);
-        }
-    }, [result]);
-
+        };
+        invoke(fetchUser);
+    }, []);
     return (
         <>
             {
-                !loading&&(
+                user&&(
                     children
                 )||null
             }
@@ -51,6 +55,7 @@ export function AppContext({children}:React.PropsWithChildren<{}>) {
     useEffect(()=>{
         if(token === null) {
             setUser(null);
+            LocaleStorage.remove(tokenStorageKey);
         } else {
             LocaleStorage.set(tokenStorageKey, token);
         }
@@ -71,6 +76,15 @@ export function AppContext({children}:React.PropsWithChildren<{}>) {
                     headers: {
                         Accept: 'application/json',
                         Authorization: `Bearer ${token.access_token}`
+                    },
+                    interceptors: {
+                        response:response => {
+                            if(response.status === 401) {
+                                setTimeout(()=>setTokenLocally(null), 1);
+                                return null;
+                            }
+                            return response;
+                        }
                     }
                 }}>
                     <UserContext setUser={setUser}>

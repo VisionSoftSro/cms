@@ -6,3 +6,7 @@ export function get<T>(key:string, initialValue:T = null) {
 export function set<T>(key:string, value:T) {
     window.localStorage.setItem(key, JSON.stringify(value));
 }
+
+export function remove(key:string) {
+    window.localStorage.removeItem(key);
+}

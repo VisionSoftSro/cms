@@ -12,9 +12,7 @@ import org.visionsoft.cms.mvc.model.converter.UserConverter
 
 @RequestMapping("/user")
 @RestController
-class AdminApiController{
-    @Autowired
-    lateinit var userDao: UserDao
+class CurrentUserController {
     @Autowired
     lateinit var userConverter:UserConverter
 
