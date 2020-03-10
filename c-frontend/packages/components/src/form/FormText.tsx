@@ -4,7 +4,7 @@ import * as _validators from "./validators";
 import {TextField, TextFieldProps} from "@material-ui/core";
 
 
-interface TextProps {
+declare interface TextProps {
     label: string
     name: string
     minLength?: number

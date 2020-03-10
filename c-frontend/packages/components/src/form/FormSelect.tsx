@@ -8,7 +8,7 @@ import {AutocompleteProps} from "@material-ui/lab/Autocomplete/Autocomplete";
 type OptionType = {
 
 };
-interface SelectProps<T = any> {
+declare interface SelectProps<T = any> {
     label: string
     name: string
     options:T[],

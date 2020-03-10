@@ -1,44 +1,95 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# `Modern Monorepo Boilerplate`
 
-## Available Scripts
+[![CircleCI](https://circleci.com/gh/michaljach/modern-monorepo-boilerplate/tree/master.svg?style=svg)](https://circleci.com/gh/michaljach/modern-monorepo-boilerplate/tree/master)
 
-In the project directory, you can run:
+## Usage
 
-### `npm start`
+Running this project should be very easy, quick and automatic using monorepo apporach.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Install [lerna](https://github.com/lerna/lerna) first: `yarn global add lerna`
+- Run `yarn bootstrap` to install all dependencies and setup monorepo symlinks using [lerna](https://github.com/lerna/lerna).
+- Run `yarn start` to start development server with all packages included, by default you'll run `@namespace/react-app`.
+- Run `yarn test` to test all packages simultaneously.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+## Setup explained
 
-### `npm test`
+### Tooling
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Monorepo is done using npm and [lerna](https://github.com/lerna/lerna).
 
-### `npm run build`
+  - Packages are automatically linked together, meaning you can do cross-package work within the repo with hot module reloading and without any building.
+  - Commonly used dependencies are hoisted from root, and only appear in the root `package.json`.
+  - All shared dependencies appear only as `peerDependecies` in each package.
+  - Running `yarn build` makes production-ready builds of all packages.
+  - Running `yarn test` runs tests for all packages at once.
+  - Each package has its own `scripts` and `dependencies` keys. They are being installed in the root `node_modules` and you can still run standalone commands within each package from its `scripts`.
+  - Adding new packages is as simple as dropping an existing package in the `packages` folder, and re-running `yarn bootstrap`.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Sources and tests are written in strict [TypeScript](https://github.com/Microsoft/TypeScript).
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+  - We use a single, common, `tsconfig.json`, from which all other `tsconfig.json` files inherit (using `"extends"`).
+  - Each project has `src` folder, each with their own `tsconfig.json`. This allows us to define which `@types` packages are accessible on a per-folder basis (`src` should not have access to `test` globals).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Testing is done using [jest](https://jestjs.io/) and [enzyme](https://airbnb.io/enzyme/).
+  - Light, battle-tested, projects with few dependencies.
+  - Components are snapshot-tested.
+  - All tests are written in TypeScript and linted via ESLint
 
-### `npm run eject`
+### Included sample packages
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- **@namespace/components**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  - [React](https://github.com/facebook/react) components library.
+  - Built as `cjs` (Node consumption) and `esm` (bundler consumption).
+  - All componenents are linked dynamically without rebuilding or compiling.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- **@namespace/react-app**
+  - [React](https://github.com/facebook/react) application.
+  - Built with minimal [CRA](https://github.com/facebook/create-react-app) setup.
+  - Uses the `@namespace/components` package (also inside monorepo).
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Basic structure and configurations
 
-## Learn More
+```
+packages/
+    some-package/
+        src/
+            some-folder/
+            index.ts         // combined exports
+        tsconfig.json        // extends ./tsconfig.json
+        package.json         // package-specific deps and scripts
+        README.md            // docs are important
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+README.md         // docs are important
+.gitignore        // github's default node gitignore with customizations
+.npmrc            // internal npm repository config
+lerna.json        // lerna configuration
+LICENSE           // root license file. picked up by github
+package.json      // common dev deps and workspace-wide scripts
+setupTests.ts     // enzyme and all tests setup file
+tsconfig.json     // common typescript configuration
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Dependency management
+
+Traditionally, working with projects in separate repositories makes it difficult to keep versions of `devDependencies` aligned, as each project can specify its own `devDependency` versions.
+Monorepos simplify this, because `devDependencies` are shared between all packages within the monorepo.
+Taking this into account, we use the following dependency structure:
+
+- shared `dependencies` and `devDependencies` are placed in the root `package.json`
+- `dependencies` and `devDependencies` are placed in the `package.json` of the relevant package requiring them, as each package is published separately
+- commonly used dependencies are placed in `peerDependencies`
+
+New `dependencies` can be added to the root `package.json` using npm:
+
+```sh
+yarn add <package name> -W [-D]
+```
+
+Some packages depend on sibling packages within the monorepo. For example, in this repo, `@namespace/react-app` depends on `@namespace/components`. This relationship is just a normal dependency, and can be described in the `package.json` of `@namespace/react-app` like so:
+
+```json
+"dependencies": {
+  "@namespace/components": "<package version>"
+}
+```

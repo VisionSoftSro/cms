@@ -4,7 +4,7 @@ import * as _validators from "./validators";
 import {Checkbox, FormControlLabel, FormHelperText, TextField, TextFieldProps, Typography} from "@material-ui/core";
 
 
-interface CheckBoxProps {
+declare interface CheckBoxProps {
     label: string
     name: string
     mustChecked?: boolean

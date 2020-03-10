@@ -1,17 +1,26 @@
-import React from 'react'
-import { useTable } from 'react-table'
-import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, withStyles} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
-import headColor from '@material-ui/core/colors/grey';
-type Column<TData> = {
+import React from 'react';
+import {
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableProps,
+    TableRow,
+    withStyles
+} from "@material-ui/core";
+
+export type Column<TData> = {
     field: string,
     label: string,
     render?: (row:TData) => string | React.ElementType
 }
-type TableProps<TData> = {
+export type VSTableProps<TData> = {
     columns: Column<TData>[]
     data:TData[]
-};
+}&TableProps;
+
 const StyledTableCell = withStyles(theme => ({
     head: {
         backgroundColor: theme.palette.primary.dark,
@@ -26,17 +35,11 @@ const StyledTableRow = withStyles(theme => ({
     root: {
         '&:nth-of-type(odd)': {
             backgroundColor: theme.palette.background.default,
-        },
+    },
     },
 }))(TableRow);
 
-const useStyles = makeStyles({
-    table: {
-        minWidth: 650,
-    }
-});
-export function VSTable<TData=any>({ columns, data }:TableProps<TData>) {
-    const classes = useStyles();
+export function VSTable<TData=any>({ columns, data, classes}:VSTableProps<TData>) {
     const renderCell = (row:TData, field:string) => {
         const keyed = row as any as {[key:string]:string};
         return keyed[field];
@@ -44,7 +47,7 @@ export function VSTable<TData=any>({ columns, data }:TableProps<TData>) {
     // Render the UI for your table
     return (
         <TableContainer component={Paper}>
-            <Table className={classes.table} aria-label="simple table">
+            <Table aria-label="simple table">
                 <TableHead>
                     <TableRow>
                         {columns.map((c, i)=>(<StyledTableCell key={i}>{c.label}</StyledTableCell>))}

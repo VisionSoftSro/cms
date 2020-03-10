@@ -1,44 +1,104 @@
 {
-  "name": "eshop-v2",
-  "version": "0.1.0",
+  "name": "namespace",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "start": "lerna run start --stream",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "enzyme-to-json": "^3.4.3",
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "jest": "^24.9.0",
+    "lerna": "^3.18.1",
+    "prettier": "^1.18.2",
+    "react-app-rewired": "^2.1.3",
+    "ts-jest": "^24.1.0"
+  },
   "dependencies": {
+    "@types/enzyme-adapter-react-16": "^1.0.5",
+    "@types/jest": "24.0.19",
+    "@types/node": "12.11.1",
+    "@types/react": "16.9.9",
+    "@types/react-dom": "16.9.2",
+    "customize-cra": "^0.8.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0",
+    "react-scripts": "^3.4.0",
+    "typescript": "^3.8.3",
     "@material-ui/core": "^4.9.5",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.45",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.4.1",
-    "@testing-library/user-event": "^7.2.1",
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.29",
-    "@types/react": "^16.9.23",
-    "@types/react-dom": "^16.9.5",
     "final-form": "^4.18.7",
-    "http-proxy-middleware": "^1.0.1",
-    "i18next": "^19.3.2",
-    "i18next-browser-languagedetector": "^4.0.2",
-    "i18next-chained-backend": "^2.0.1",
-    "lodash": "^4.17.15",
-    "moment": "^2.24.0",
-    "numeral": "^2.0.6",
-    "react": "^16.13.0",
-    "react-dom": "^16.13.0",
-    "react-final-form": "^6.3.5",
-    "react-i18next": "^11.3.3",
-    "react-router": "^5.1.2",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.0",
-    "react-table": "^7.0.0-rc.16",
-    "typescript": "^3.7.5",
-    "use-http": "^0.2.9"
+    "react-final-form": "^6.3.5"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test"
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "setupFilesAfterEnv": [
+      "./setupTests.ts"
+    ],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "collectCoverageFrom": [
+      "packages/*/src/**/*.{js,jsx,ts,tsx}"
+    ]
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "airbnb",
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier/@typescript-eslint",
+      "prettier/react",
+      "plugin:prettier/recommended"
+    ],
+    "rules": {
+      "@typescript-eslint/no-explicit-any": [
+        "error"
+      ],
+      "@typescript-eslint/explicit-function-return-type": [
+        "error"
+      ],
+      "react/jsx-filename-extension": [
+        1,
+        {
+          "extensions": [
+            ".tsx"
+          ]
+        }
+      ]
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      },
+      "import/resolver": {
+        "node": {
+          "extensions": [
+            ".js",
+            ".ts",
+            ".tsx"
+          ]
+        }
+      }
+    }
   },
   "browserslist": {
     "production": [
@@ -52,10 +112,11 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "@types/lodash": "^4.14.149",
-    "@types/numeral": "0.0.26",
-    "@types/react-router-dom": "^5.1.3",
-    "@types/react-table": "^7.0.10"
+  "prettier": {
+    "semi": true,
+    "trailingComma": "all",
+    "singleQuote": true,
+    "printWidth": 120,
+    "tabWidth": 2
   }
 }

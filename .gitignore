@@ -219,3 +219,6 @@ pip-log.txt
 *node_modules/
 *npm/
 src/main/webapp/WEB-INF/resources/built/
+
+lib
+lib-esm
