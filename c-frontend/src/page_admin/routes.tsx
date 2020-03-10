@@ -1,44 +1,93 @@
-import PeopleIcon from "@material-ui/icons/People";
-import DnsRoundedIcon from "@material-ui/icons/DnsRounded";
-import PermMediaOutlinedIcon from "@material-ui/icons/PhotoSizeSelectActual";
-import PublicIcon from "@material-ui/icons/Public";
-import SettingsEthernetIcon from "@material-ui/icons/SettingsEthernet";
-import SettingsInputComponentIcon from "@material-ui/icons/SettingsInputComponent";
 import SettingsIcon from "@material-ui/icons/Settings";
 import TimerIcon from "@material-ui/icons/Timer";
 import PhonelinkSetupIcon from "@material-ui/icons/PhonelinkSetup";
 import React from "react";
-import {Articles} from "./page/Articles";
 import {useLocation, useRouteMatch} from "react-router";
 import CategoryIcon from '@material-ui/icons/Category';
 import DescriptionIcon from '@material-ui/icons/Description';
-export const routes = [
+import {useTranslation} from "react-i18next";
+import {Articles} from "./page/Articles";
+import {useAppContext} from "../context/admin/AppContext";
+import {Dashboard} from "./page/Dashboard";
+
+export type Route = {
+    id:string,
+    href:string,
+    component?:any,
+    icon:any,
+    children?:Route[]
+}
+
+export const routes:Route[] = [
     {
-        id: 'Codebook',
-        children: [
-            { id: 'Articles', icon: <DescriptionIcon />, href:"/article", component:Articles},
-            { id: 'Categories', icon: <CategoryIcon />, href:"/category", component:Articles}
-        ],
+        id: 'Dashboard',
+        href: "/dashboard",
+        component: Dashboard,
+        icon: <DescriptionIcon/>
     },
     {
-        id: 'Quality',
-        children: [
-            { id: 'Analytics', icon: <SettingsIcon />, href:"/article7", component:Articles},
-            { id: 'Performance', icon: <TimerIcon />, href:"/article8", component:Articles},
-            { id: 'Test Lab', icon: <PhonelinkSetupIcon />, href:"/article9", component:Articles},
-        ],
+        id: 'Articles',
+        href: "/articles",
+        component: Articles,
+        icon: <DescriptionIcon/>
     },
+    // {
+    //     id: 'Assign',
+    //     href: "/zadat",
+    //     icon: <DescriptionIcon/>,
+    //     children: [
+    //         {href: "/vlastnivozy", component: Articles, icon: <DescriptionIcon />, id: "DialVlastniVozy"},
+    //         {href: "/prepravy", component: Articles, icon: <DescriptionIcon />, id: "DialPrepravy"}
+    //     ],
+    // },
+    // {
+    //     id: 'Dials',
+    //     href: "/ciselniky",
+    //     icon: <DescriptionIcon/>,
+    //     children: [
+    //         {href: "/uzivatele", component: UzivatelCiselnik, icon: <DescriptionIcon />, id: "DialUsers"},
+    //         {href: "/licence", component: LicenceCiselnik, icon: <DescriptionIcon />, id: "DialLicence"},
+    //         {href: "/provozovny", component: ProvozovnaCiselnik, icon: <DescriptionIcon />, id: "DialPlaces"},
+    //         {href: "/firmy", component: FirmaCiselnik, icon: <DescriptionIcon />, id: "DialCompanies"},
+    //         {href: "/dispeceri", component: DispeceriCiselnik, icon: <DescriptionIcon />, id: "DialDispeceri"},
+    //         {href: "/texty", component: TextyCiselnik, icon: <DescriptionIcon />, id: "LocalizedTexts"},
+    //         {href: "/staty", component: StatCiselnik, icon: <DescriptionIcon />, id: "DialCountries"},
+    //         {href: "/meny", component: CurrencyCiselnik, icon: <DescriptionIcon />, id: "DialCurrencies"},
+    //         {href: "/nezadouciSlova", component: NezadouciSlovaCiselnik, icon: <DescriptionIcon />, id: "DialNezadouciSlova"},
+    //         {href: "/hlidanaSlovaFirma", component: HlidanaSlovaCiselnik, icon: <DescriptionIcon />, id: "DialHlidanaSlova"},
+    //         {href: "/parametry", component: SystemParameterCiselnik, icon: <DescriptionIcon />, id: "DialParams"},
+    //         {href: "/joby", component: JobCiselnik, icon: <DescriptionIcon />, id: "DialJobs"}
+    //     ]
+    // },
 ];
 
-export const useFlatRoutes = () => {
-    return routes.map(r=>r.children).flat();
+export const useProtectedRoutes = () => {
+    const {user} = useAppContext();
+    // const hasRole = (r: Route) => {
+    //     const roles = r.roles || [];
+    //     if (roles.length === 0) return true;
+    //     for (let i in roles) {
+    //         if (user.roles.includes(roles[i])) return true
+    //     }
+    //     return false;
+    // };
+    return routes;//.filter(hasRole)
+};
+
+export const useFlatRoutes = ():Route[] => {
+    const navList = useProtectedRoutes();
+    const children = navList.filter(n => n.children).map(n => n.children.map(s => ({
+        ...s,
+        href: `${n.href}${s.href}`
+    })));
+    const topLevel = navList.filter(n => !n.children);
+    return [...topLevel, ...children.flat()];
 };
 
 export function useCurrentRoute() {
     const routes = useFlatRoutes();
     const {pathname} = useLocation();
     const {url} = useRouteMatch();
-    console.log("useCurrentRoute", pathname);
-    const currentNav = routes.filter(cfg=> `${url}${cfg.href}` === pathname);
+    const currentNav = useFlatRoutes().filter(cfg => `${url}${cfg.href}` === pathname);
     return currentNav.length === 0 ? routes[0] : currentNav[0];
 }

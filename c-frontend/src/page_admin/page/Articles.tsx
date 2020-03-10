@@ -4,7 +4,7 @@ import useFetch from "use-http/dist";
 import {useLoadingContext} from "../../context/LoadingContext";
 import {Button, Paper} from "@material-ui/core";
 import {Article} from "../../api/Article";
-import {CmsTable} from "../../components/Table";
+import {VSTable} from "../../components/VSTable";
 
 export function Articles() {
     const {pathname} = useLocation();
@@ -13,7 +13,7 @@ export function Articles() {
     console.log(data);
     return (
         <Paper>
-            {data&&<CmsTable columns={[{field:"name", label:"name"}]} data={data}/>}
+            {data&&<VSTable columns={[{field:"name", label:"name"}]} data={data}/>}
         </Paper>
     );
 }

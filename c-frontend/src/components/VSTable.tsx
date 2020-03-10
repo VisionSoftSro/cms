@@ -35,7 +35,7 @@ const useStyles = makeStyles({
         minWidth: 650,
     }
 });
-export function CmsTable<TData=any>({ columns, data }:TableProps<TData>) {
+export function VSTable<TData=any>({ columns, data }:TableProps<TData>) {
     const classes = useStyles();
     const renderCell = (row:TData, field:string) => {
         const keyed = row as any as {[key:string]:string};

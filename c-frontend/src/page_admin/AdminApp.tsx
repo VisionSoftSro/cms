@@ -11,94 +11,28 @@ import Hidden from '@material-ui/core/Hidden';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import Navigator from './Navigator';
-import Content from './Content';
-import Header from './Header';
 import {routes, useFlatRoutes} from "./routes";
 import {Redirect, Switch, Route} from "react-router-dom";
 import {useRouteMatch} from "react-router";
-
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+import {useStyles} from "../assets/AdminStyles";
 
 
-const drawerWidth = 256;
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        display: 'flex',
-        minHeight: '100vh',
-    },
-    drawer: {
-        [theme.breakpoints.up('sm')]: {
-            width: drawerWidth,
-            flexShrink: 0,
-        },
-    },
-    app: {
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-    },
-    main: {
-        flex: 1,
-        padding: theme.spacing(6, 4),
-        background: '#eaeff1',
-    },
-    footer: {
-        padding: theme.spacing(2),
-        background: '#eaeff1',
-    },
-}));
-
-
-function Paperbase() {
+function AdminApp() {
     const classes = useStyles();
-    const [mobileOpen, setMobileOpen] = React.useState(false);
     const {url} = useRouteMatch();
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
-
     return (
-            <div className={classes.root}>
-                <CssBaseline />
-                <nav className={classes.drawer}>
-                    <Hidden smUp implementation="js">
-                        <Navigator
-                            PaperProps={{ style: { width: drawerWidth } }}
-                            variant="temporary"
-                            open={mobileOpen}
-                            onClose={handleDrawerToggle}
-                        />
-                    </Hidden>
-                    <Hidden xsDown implementation="css">
-                        <Navigator PaperProps={{ style: { width: drawerWidth } }} />
-                    </Hidden>
-                </nav>
-                <div className={classes.app}>
-                    <Header onDrawerToggle={handleDrawerToggle} />
-                    <main className={classes.main}>
-                        <Switch>
-                            {useFlatRoutes().map(route=>(<Route key={route.href} path={`${url}${route.href}`} component={route.component}/>))}
-                            <Redirect from={`${url}`} to={`${url}/article`} />
-                        </Switch>
-                    </main>
-                    <footer className={classes.footer}>
-                        <Copyright />
-                    </footer>
-                </div>
-            </div>
+        <div className={classes.root}>
+            <CssBaseline />
+            <Navigator />
+            <main className={classes.content}>
+                <div className={classes.toolbar} />
+                <Switch>
+                    {useFlatRoutes().map(route=>(<Route key={route.href} path={`${url}${route.href}`} component={route.component}/>))}
+                    <Redirect from={`${url}`} to={`${url}/article`} />
+                </Switch>
+            </main>
+        </div>
     );
 }
 
-export default Paperbase;
+export default AdminApp;

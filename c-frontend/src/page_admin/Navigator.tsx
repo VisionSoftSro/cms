@@ -1,131 +1,188 @@
-import React from 'react';
+import React, {useContext, useEffect, useReducer, useState} from 'react';
 import clsx from 'clsx';
-import { createStyles, Theme, withStyles, WithStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
 import Drawer, { DrawerProps } from '@material-ui/core/Drawer';
-import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import HomeIcon from '@material-ui/icons/Home';
-import PeopleIcon from '@material-ui/icons/People';
-import DnsRoundedIcon from '@material-ui/icons/DnsRounded';
-import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
-import PublicIcon from '@material-ui/icons/Public';
-import SettingsEthernetIcon from '@material-ui/icons/SettingsEthernet';
-import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
-import TimerIcon from '@material-ui/icons/Timer';
-import SettingsIcon from '@material-ui/icons/Settings';
-import PhonelinkSetupIcon from '@material-ui/icons/PhonelinkSetup';
 import { Omit } from '@material-ui/types';
 import {useTranslation} from "react-i18next";
 import {useHistory, useLocation, useRouteMatch} from "react-router";
-import {routes} from "./routes";
+
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import MenuIcon from "@material-ui/icons/Menu";
+import AppBar, {AppBarProps} from "@material-ui/core/AppBar";
 
 
+import {Button, Collapse, Grid, Hidden, Link, Typography} from "@material-ui/core";
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import {useStyles} from "../assets/AdminStyles";
+import {Route, useCurrentRoute, useProtectedRoutes} from "./routes";
+import {AssetCache} from "../AssetCache";
+import {Header} from "./Header";
 
-const styles = (theme: Theme) =>
-    createStyles({
-        categoryHeader: {
-            paddingTop: theme.spacing(2),
-            paddingBottom: theme.spacing(2),
-        },
-        categoryHeaderPrimary: {
-            color: theme.palette.common.white,
-        },
-        item: {
-            paddingTop: 1,
-            paddingBottom: 1,
-            color: 'rgba(255, 255, 255, 0.7)',
-            '&:hover,&:focus': {
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-            },
-        },
-        itemCategory: {
-            backgroundColor: '#232f3e',
-            boxShadow: '0 -1px 0 #404854 inset',
-            paddingTop: theme.spacing(2),
-            paddingBottom: theme.spacing(2),
-        },
-        firebase: {
-            fontSize: 24,
-            color: theme.palette.common.white,
-        },
-        itemActiveItem: {
-            color: theme.palette.primary.light,
-        },
-        itemPrimary: {
-            fontSize: 'inherit',
-        },
-        itemIcon: {
-            minWidth: 'auto',
-            marginRight: theme.spacing(2),
-        },
-        divider: {
-            marginTop: theme.spacing(2),
-        },
-    });
 
-export interface NavigatorProps extends Omit<DrawerProps, 'classes'>, WithStyles<typeof styles> {}
+export interface FlexibleDrawerProps extends Omit<DrawerProps, 'classes'> {}
+export interface FlexibleAppBarProps extends Omit<AppBarProps, 'classes'> {
+    handleDrawerToggle?:VoidFunction
+}
 
-function Navigator(props: NavigatorProps) {
-    const { classes, ...other } = props;
+type ListLinkProps = Route&{nested?:boolean};
+enum ActionType {CloseAll}
+type State = {isOpen: boolean};
+type Action = {type:ActionType};
+const SidebarContext = React.createContext<{state:State, dispatch:(action:Action) => void}>(null);
+function reducer(state:State, action:Action) : State {
+    if (action.type === ActionType.CloseAll) {
+        return {...state, ...{isOpen:!state.isOpen}};
+    }
+    return state;
+}
+
+const useClose = (defaultValue:boolean):[boolean, (value:boolean)=>void] => {
+    const {state} = useContext(SidebarContext);
+    const [opened, setOpened] = useState(defaultValue);
+    useEffect(()=>{
+        if(state.isOpen !== null) {
+            setOpened(false);
+        }
+    }, [state.isOpen]);
+    return [opened, setOpened];
+};
+function CategoryList({parent, component}:{parent:Route, component:React.ComponentType<ListLinkProps>}) {
+    const ListLink = component;
+    const routes = parent.children;
+    const {t} = useTranslation();
+    const classes = useStyles();
+    const {pathname} = useLocation();
+    const [open, setOpen] = useClose(false);
+    return (
+        <>
+            <ListItem button
+                      onClick={()=>setOpen(!open)}
+                      className={clsx(pathname.startsWith(parent.href)&&classes.activeLink||undefined)}>
+                <ListItemIcon>{parent.icon}</ListItemIcon>
+                <ListItemText primary={t(parent.id)} /> {open ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={open} timeout="auto">
+                {routes.map((child) => (
+                    <ListLink {...child} href={parent.href+child.href} key={child.id} nested />
+                ))}
+            </Collapse>
+        </>
+    );
+}
+
+function FlexibleDrawer(props:FlexibleDrawerProps) {
+    const routes = useProtectedRoutes();
+    const classes = useStyles();
     const {t} = useTranslation();
     const {pathname} = useLocation();
     const {url} = useRouteMatch();
     const {push} = useHistory();
+    const ListLink = ({id: childId, icon, href, nested=false}:ListLinkProps) => {
+        const fullHref = `${url}${href}`;
+        return (
+            <ListItem
+                className={clsx(nested&&classes.nested||undefined, `${fullHref}`===pathname&&classes.activeLink||undefined)}
+                key={childId}
+                button
+                component="a"
+                onClick={(e:any)=>{e.preventDefault();push(`${fullHref}`);}}
+                href={fullHref}
+            >
+                <ListItemIcon>{icon}</ListItemIcon>
+                <ListItemText primary={t(childId)}/>
+            </ListItem>
+        );
+    };
+
     return (
-        <Drawer variant="permanent" {...other}>
-            <List disablePadding>
-                <ListItem className={clsx(classes.firebase, classes.item, classes.itemCategory)}>
-                    Paperbase
-                </ListItem>
-                <ListItem className={clsx(classes.item, classes.itemCategory)}>
-                    <ListItemIcon className={classes.itemIcon}>
-                        <HomeIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                        classes={{
-                            primary: classes.itemPrimary,
-                        }}
-                    >
-                        Project Overview
-                    </ListItemText>
-                </ListItem>
-                {routes.map(({ id, children }) => (
-                    <React.Fragment key={id}>
-                        <ListItem className={classes.categoryHeader}>
-                            <ListItemText
-                                classes={{
-                                    primary: classes.categoryHeaderPrimary,
-                                }}
-                            >
-                                {t(id)}
-                            </ListItemText>
-                        </ListItem>
-                        {children.map(({ id: childId, icon, href }) => (
-                            <ListItem
-                                key={childId}
-                                button
-                                onClick={()=>push(`${url}${href}`)}
-                                className={clsx(classes.item, `${url}${href}`===pathname && classes.itemActiveItem)}
-                            >
-                                <ListItemIcon className={classes.itemIcon}>{icon}</ListItemIcon>
-                                <ListItemText
-                                    classes={{
-                                        primary: classes.itemPrimary,
-                                    }}
-                                >
-                                    {t(childId)}
-                                </ListItemText>
-                            </ListItem>
-                        ))}
-                        <Divider className={classes.divider} />
-                    </React.Fragment>
-                ))}
-            </List>
+        <Drawer
+            variant="permanent"
+            className={classes.drawer}
+            classes={{
+                paper: classes.drawerPaper,
+            }}
+            {...props}
+        >
+            <div className={clsx(classes.menuToolbar, classes.toolbar)}>
+                Smer server
+            </div>
+            {routes.map((parent) => (
+                <React.Fragment key={parent.id}>
+                    {
+                        !parent.children&&(
+                            <ListLink {...parent} href={parent.href} key={parent.id} />
+                        )
+                    }
+                    {parent.children&&<CategoryList parent={parent} component={ListLink} />}
+                    <Divider/>
+                </React.Fragment>
+            ))}
         </Drawer>
     );
 }
 
-export default withStyles(styles)(Navigator);
+function FlexibleAppBar({handleDrawerToggle, ...props}:FlexibleAppBarProps) {
+    const classes = useStyles();
+    const {t} = useTranslation();
+    return (
+        <div className={classes.flexGrow}>
+            <AppBar position="fixed" {...props}>
+                <Toolbar>
+                    <Grid container spacing={1} alignItems="center">
+                        <Hidden smUp>
+                            <IconButton
+                                color="inherit"
+                                edge="start"
+                                onClick={handleDrawerToggle}>
+                                <MenuIcon />
+                            </IconButton>
+                        </Hidden>
+                        <Typography>
+                            {t(useCurrentRoute().id)}
+                        </Typography>
+                        <div className={classes.flexGrow}/>
+                        <Header />
+                    </Grid>
+                </Toolbar>
+            </AppBar>
+        </div>
+    );
+}
+
+export default function Navigator() {
+    const classes = useStyles();
+    const [state, dispatch] = useReducer(reducer, {isOpen: false});
+    const [open, setOpen] = useState(false);
+
+    const handleDrawerOpen = () => {
+        setOpen(true);
+    };
+
+    const handleDrawerClose = () => {
+        setOpen(false);
+    };
+    const handleDrawerToggle = () => {
+        setOpen(!open);
+    };
+    return (
+        <SidebarContext.Provider value={{ state, dispatch }}>
+            <Hidden smUp implementation="js">
+                <FlexibleAppBar className={clsx(classes.appBar)} handleDrawerToggle={handleDrawerToggle} />
+                <FlexibleDrawer
+                    variant="temporary"
+                    open={open}
+                    onClose={handleDrawerToggle}
+                />
+            </Hidden>
+            <Hidden xsDown implementation="css">
+                <FlexibleAppBar className={clsx(classes.appBar, classes.appBarDesktop)} />
+                <FlexibleDrawer />
+            </Hidden>
+        </SidebarContext.Provider>
+    );
+}
