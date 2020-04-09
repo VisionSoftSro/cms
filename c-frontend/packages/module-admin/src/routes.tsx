@@ -26,46 +26,10 @@ export const routes:Route[] = [
         component: Articles,
         icon: <DescriptionIcon/>
     },
-    // {
-    //     id: 'Assign',
-    //     href: "/zadat",
-    //     icon: <DescriptionIcon/>,
-    //     children: [
-    //         {href: "/vlastnivozy", component: Articles, icon: <DescriptionIcon />, id: "DialVlastniVozy"},
-    //         {href: "/prepravy", component: Articles, icon: <DescriptionIcon />, id: "DialPrepravy"}
-    //     ],
-    // },
-    // {
-    //     id: 'Dials',
-    //     href: "/ciselniky",
-    //     icon: <DescriptionIcon/>,
-    //     children: [
-    //         {href: "/uzivatele", component: UzivatelCiselnik, icon: <DescriptionIcon />, id: "DialUsers"},
-    //         {href: "/licence", component: LicenceCiselnik, icon: <DescriptionIcon />, id: "DialLicence"},
-    //         {href: "/provozovny", component: ProvozovnaCiselnik, icon: <DescriptionIcon />, id: "DialPlaces"},
-    //         {href: "/firmy", component: FirmaCiselnik, icon: <DescriptionIcon />, id: "DialCompanies"},
-    //         {href: "/dispeceri", component: DispeceriCiselnik, icon: <DescriptionIcon />, id: "DialDispeceri"},
-    //         {href: "/texty", component: TextyCiselnik, icon: <DescriptionIcon />, id: "LocalizedTexts"},
-    //         {href: "/staty", component: StatCiselnik, icon: <DescriptionIcon />, id: "DialCountries"},
-    //         {href: "/meny", component: CurrencyCiselnik, icon: <DescriptionIcon />, id: "DialCurrencies"},
-    //         {href: "/nezadouciSlova", component: NezadouciSlovaCiselnik, icon: <DescriptionIcon />, id: "DialNezadouciSlova"},
-    //         {href: "/hlidanaSlovaFirma", component: HlidanaSlovaCiselnik, icon: <DescriptionIcon />, id: "DialHlidanaSlova"},
-    //         {href: "/parametry", component: SystemParameterCiselnik, icon: <DescriptionIcon />, id: "DialParams"},
-    //         {href: "/joby", component: JobCiselnik, icon: <DescriptionIcon />, id: "DialJobs"}
-    //     ]
-    // },
 ];
 
 export const useProtectedRoutes = () => {
     const {user} = useAppContext();
-    // const hasRole = (r: Route) => {
-    //     const roles = r.roles || [];
-    //     if (roles.length === 0) return true;
-    //     for (let i in roles) {
-    //         if (user.roles.includes(roles[i])) return true
-    //     }
-    //     return false;
-    // };
     return routes;//.filter(hasRole)
 };
 

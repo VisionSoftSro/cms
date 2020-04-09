@@ -7,21 +7,21 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import {Omit} from '@material-ui/types';
 import {useTranslation} from "react-i18next";
-import {useHistory, useLocation, useRouteMatch} from "react-router";
-
+import {useHistory, useLocation} from "react-router";
+import {Route, useCurrentRoute, useProtectedRoutes} from "./routes";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import AppBar, {AppBarProps} from "@material-ui/core/AppBar";
 
-
-import {Collapse, Grid, Hidden, Typography} from "@material-ui/core";
+import {Hidden, Typography} from "@material-ui/core";
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import {Route, useCurrentRoute, useProtectedRoutes} from "./routes";
+
 import {Header} from "./Header";
 import {useStyleContext} from "./context/admin/AdminThemeContext";
-
+import {AssetCache} from "@vision-soft/module-api/src";
+import {useRouteMatch} from 'react-router-dom';
 
 export interface FlexibleDrawerProps extends Omit<DrawerProps, 'classes'> {}
 export interface FlexibleAppBarProps extends Omit<AppBarProps, 'classes'> {
@@ -65,11 +65,12 @@ function CategoryList({parent, component}:{parent:Route, component:React.Compone
                 <ListItemIcon>{parent.icon}</ListItemIcon>
                 <ListItemText primary={t(parent.id)} /> {open ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-            <Collapse in={open} timeout="auto">
-                {routes.map((child) => (
+            {
+                open&&
+                routes.map((child) => (
                     <ListLink {...child} href={parent.href+child.href} key={child.id} nested />
-                ))}
-            </Collapse>
+                ))
+            }
         </>
     );
 }
@@ -79,8 +80,8 @@ function FlexibleDrawer(props:FlexibleDrawerProps) {
     const {classes} = useStyleContext();
     const {t} = useTranslation();
     const {pathname} = useLocation();
-    const {url} = useRouteMatch();
     const {push} = useHistory();
+    const {url} = useRouteMatch();
     const ListLink = ({id: childId, icon, href, nested=false}:ListLinkProps) => {
         const fullHref = `${url}${href}`;
         return (
@@ -107,8 +108,9 @@ function FlexibleDrawer(props:FlexibleDrawerProps) {
             }}
             {...props}
         >
+
             <div className={clsx(classes.menuToolbar, classes.toolbar)}>
-                Smer server
+                <img src={AssetCache.Image.Logo} alt={"logo"} style={{ width: 50 }}/>
             </div>
             {routes.map((parent) => (
                 <React.Fragment key={parent.id}>
@@ -129,59 +131,62 @@ function FlexibleAppBar({handleDrawerToggle, ...props}:FlexibleAppBarProps) {
     const {classes} = useStyleContext();
     const {t} = useTranslation();
     return (
-        <div className={classes.flexGrow}>
-            <AppBar position="fixed" {...props}>
-                <Toolbar>
-                    <Grid container spacing={1} alignItems="center">
-                        <Hidden smUp>
-                            <IconButton
-                                color="inherit"
-                                edge="start"
-                                onClick={handleDrawerToggle}>
-                                <MenuIcon />
-                            </IconButton>
-                        </Hidden>
-                        <Typography>
-                            {t(useCurrentRoute().id)}
-                        </Typography>
-                        <div className={classes.flexGrow}/>
-                        <Header />
-                    </Grid>
-                </Toolbar>
-            </AppBar>
-        </div>
+        <AppBar position="fixed" {...props}>
+            <Toolbar variant={"regular"}>
+                <IconButton
+                    color="inherit"
+                    edge="start"
+                    onClick={handleDrawerToggle}>
+                    <MenuIcon />
+                </IconButton>
+                <Typography>
+                    {t(useCurrentRoute().id)}
+                </Typography>
+                <div className={classes.flexGrow}/>
+                <Header />
+            </Toolbar>
+        </AppBar>
     );
 }
 
 export default function Navigator() {
     const {classes} = useStyleContext();
+    //reducer slouzi pro zavirani polozek menu nikAoliv pro cely drawer
     const [state, dispatch] = useReducer(reducer, {isOpen: false});
-    const [open, setOpen] = useState(false);
 
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
+    const [openMobile, setOpenMobile] = React.useState(false);
+    const [open, setOpen] = React.useState(true);
     const handleDrawerToggle = () => {
         setOpen(!open);
     };
+    const handleDrawerToggleMobile = () => {
+        setOpenMobile(!openMobile);
+    };
     return (
-        <SidebarContext.Provider value={{ state, dispatch }}>
-            <Hidden smUp implementation="js">
-                <FlexibleAppBar className={clsx(classes.appBar)} handleDrawerToggle={handleDrawerToggle} />
-                <FlexibleDrawer
-                    variant="temporary"
-                    open={open}
-                    onClose={handleDrawerToggle}
-                />
-            </Hidden>
-            <Hidden xsDown implementation="css">
-                <FlexibleAppBar className={clsx(classes.appBar, classes.appBarDesktop)} />
-                <FlexibleDrawer />
-            </Hidden>
-        </SidebarContext.Provider>
+        <>
+            <SidebarContext.Provider value={{ state, dispatch }}>
+                <Hidden smUp implementation="js">
+                    <FlexibleAppBar className={clsx(classes.appBar)} handleDrawerToggle={handleDrawerToggleMobile} />
+                    <FlexibleDrawer
+                        variant="temporary"
+                        open={openMobile}
+                        onClose={handleDrawerToggleMobile}
+                    />
+                </Hidden>
+                <Hidden xsDown implementation="css">
+                    <FlexibleAppBar className={clsx(classes.appBar, {
+                        [classes.appBarShift]: open,
+                    })} handleDrawerToggle={handleDrawerToggle} />
+                    <FlexibleDrawer
+                        variant={"persistent"}
+                        open={open}
+                        onClose={handleDrawerToggle}
+                    />
+                </Hidden>
+                <div className={clsx(classes.contentIndent, {
+                    [classes.contentIndentShift]: open,
+                })}/>
+            </SidebarContext.Provider>
+        </>
     );
 }
