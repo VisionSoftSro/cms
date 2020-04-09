@@ -43,6 +43,7 @@ export function VSTable<TData=any>({ columns, data, classes}:VSTableProps<TData>
     const renderCell = (row:TData, field:string) => {
         const keyed = row as any as {[key:string]:string};
         return keyed[field];
+        
     };
     // Render the UI for your table
     return (
